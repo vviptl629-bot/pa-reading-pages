@@ -1,0 +1,33 @@
+{
+  "_note": "PAGES-v1",
+  "name": "价格行为 · 阅读库",
+  "short_name": "PA阅读",
+  "description": "15 本交易与综合阅读书籍的离线阅读器",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#0E9488",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/vviptl629-bot/pa-icons/main/icon-192.png?v2",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/vviptl629-bot/pa-icons/main/icon-512.png?v2",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/vviptl629-bot/pa-icons/main/icon-maskable.png?v2",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

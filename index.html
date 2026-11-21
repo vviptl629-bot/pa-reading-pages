@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<!-- ICONV2-v1 -->
+<!-- ICONPUB-v1 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- PWA-v1 -->
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#0E9488">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PA阅读">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/vviptl629-bot/pa-icons/main/apple-touch-icon.png?v2">
+<title>价格行为 · 阅读库</title>
+<link rel="icon" href="https://raw.githubusercontent.com/vviptl629-bot/pa-icons/main/icon-192.png?v2">
+<style>
+:root{
+  --bg:#ffffff; --text:#111418; --muted:#555e68; --line:#d8dee4;
+  --panel:#f5f7f8; --accent:#0E9488; --deep:#0A7A70;
+  --soft:rgba(14,148,136,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:48px 24px 80px}
+
+/* hero */
+.hero{display:flex;align-items:center;gap:18px;margin-bottom:28px}
+.hero .mark{
+  flex:none;width:54px;height:54px;border-radius:14px;background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:28px;
+}
+.hero h1{font-size:30px;line-height:1.25;letter-spacing:.5px}
+.hero p{color:var(--muted);font-size:15px;margin-top:4px}
+
+/* stats */
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  margin-bottom:38px;
+}
+.stat{background:var(--bg);padding:16px 18px;text-align:center}
+.stat b{display:block;font-size:26px;color:var(--accent);line-height:1.2}
+.stat span{font-size:13px;color:var(--muted)}
+
+/* category */
+.cat{margin-bottom:40px}
+.cat-head{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding-bottom:12px;margin-bottom:18px;border-bottom:2px solid var(--accent);
+}
+.cat-title{font-size:20px;font-weight:800;display:flex;align-items:center;gap:10px}
+.cat-mark{
+  width:28px;height:28px;border-radius:7px;background:var(--accent);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;
+}
+.cat-en{font-size:12px;color:var(--muted);font-weight:400;letter-spacing:.5px}
+.cat-note{margin-left:auto;font-size:13px;color:var(--muted)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:20px}
+.card{
+  --c:var(--accent);
+  position:relative;display:flex;flex-direction:column;gap:14px;
+  background:var(--bg);border:1px solid var(--line);border-radius:14px;
+  padding:26px 24px 22px;text-decoration:none;color:inherit;overflow:hidden;
+  transition:transform .18s,border-color .18s,box-shadow .18s;
+}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.card:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 10px 28px rgba(14,148,136,.13)}
+.card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.card-head{display:flex;align-items:center;gap:12px}
+.card .mark{
+  flex:none;width:40px;height:40px;border-radius:10px;background:var(--c);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;
+}
+.card h2{font-size:19px;line-height:1.35}
+.card .sub{display:block;font-size:13px;color:var(--muted);font-weight:400;margin-top:2px}
+.metrics{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.metrics b{color:var(--text);font-size:15px}
+.desc{font-size:14px;color:var(--muted);line-height:1.8;flex:1}
+.go{
+  display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+  font-size:14px;font-weight:700;color:var(--c);
+  border:1px solid var(--c);border-radius:8px;padding:7px 14px;
+}
+.go span{font-size:17px;line-height:1}
+
+/* pending card */
+.card.pending{
+  border-style:dashed;background:var(--panel);cursor:default;
+}
+.card.pending::before{background:var(--line)}
+.card.pending:hover{transform:none;border-color:var(--line);box-shadow:none}
+.card.pending .mark{background:var(--line);color:#fff}
+.pending-tag{
+  display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
+  font-size:13px;font-weight:700;color:var(--muted);
+  border:1px dashed var(--line);border-radius:8px;padding:7px 14px;
+}
+
+/* footer */
+.foot{
+  margin-top:20px;padding-top:18px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:13px;line-height:1.9;
+}
+.foot b{color:var(--text)}
+
+@media(max-width:720px){
+  .wrap{padding:30px 16px 60px}
+  .hero{gap:12px}
+  .hero .mark{width:44px;height:44px;font-size:23px;border-radius:11px}
+  .hero h1{font-size:23px}
+  .hero p{font-size:13px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat b{font-size:22px}
+  .cat-note{margin-left:0;width:100%}
+  .grid{grid-template-columns:1fr}
+  .card{padding:22px 20px 18px}
+}
+
+@media print{
+  html,body{background:#fff!important}
+  .wrap{max-width:none;padding:0}
+  .card,.stats,.stat,.card.pending{background:#fff!important;box-shadow:none!important;border:1px solid #000!important}
+  .card::before,.hero .mark,.card .mark,.cat-mark{display:none}
+  .card h2,.go b,.stat b,.cat-title{color:#000!important}
+  .go,.pending-tag{border:1px solid #000;color:#000}
+  .card:hover{transform:none}
+  .cat-head{border-bottom:2px solid #000}
+}
+
+/* ===== today reading ===== */
+.today{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:38px}
+.today-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+.today h2{font-size:18px;font-weight:800}
+.today h2 span{font-size:13px;color:var(--muted);font-weight:400;margin-left:6px}
+.today-top p{font-size:13px;color:var(--muted)}
+.td-stats{display:flex;align-items:stretch;gap:0}
+.td-stat{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding:0 20px;border-left:1px solid var(--line)}
+.td-stat:first-child{border-left:0;padding-right:20px}
+.td-stat:last-child{padding-right:0}
+.td-stat-label{font-size:12px;color:var(--muted);white-space:nowrap;margin-bottom:2px}
+.td-stat-label em{font-style:normal;font-size:11px;opacity:.8}
+.td-total{font-size:26px;font-weight:800;color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.15}
+.td-month-total{font-size:22px;font-weight:800;color:var(--deep);white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.15}
+.td-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:26px}
+.td-row{display:flex;align-items:center;gap:9px;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
+.td-row:last-child{border-bottom:0}
+.td-row .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.td-row span{flex:1;color:var(--muted)}
+.td-row b{color:var(--text);font-variant-numeric:tabular-nums}
+.td-week-h{font-size:13px;color:var(--muted);margin-bottom:6px}
+.td-bars{display:flex;align-items:flex-end;gap:8px;height:86px}
+.td-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;height:100%}
+.td-bar i{width:100%;background:var(--accent);border-radius:4px 4px 0 0;min-height:3px;opacity:.8}
+.td-bar.today i{opacity:1;box-shadow:0 0 0 1px var(--deep)}
+.td-bar em{font-size:11px;font-style:normal;color:var(--muted)}
+@media(max-width:720px){.td-grid{grid-template-columns:1fr;gap:18px}}
+@media(max-width:560px){.today-top{align-items:flex-start;flex-wrap:wrap}.td-stats{width:100%;justify-content:flex-start;margin-top:4px}.td-stat{padding:0 16px}.td-stat:first-child{padding-left:0}.td-stat:last-child{padding-right:0}}
+@media print{.today{background:#fff!important;border:1px solid #000!important}.td-bar i{background:#fff!important;box-shadow:none!important;border:1px solid #000!important}.td-stat{border-color:#000!important}.td-total,.td-month-total{color:#000!important}}
+
+/* ===== MOBNAV-v1 手机端三类折叠侧边栏 ===== */
+.mob-topbar{display:none}
+.mob-drawer,.mob-mask{display:none}
+@media(max-width:720px){
+  .mob-topbar{
+    display:flex;align-items:center;gap:10px;
+    position:sticky;top:0;z-index:90;
+    height:52px;padding:0 16px;margin:-30px -16px 22px;
+    background:var(--bg);border-bottom:1px solid var(--line);
+  }
+  .mob-burger{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    height:38px;padding:0 14px;border:1px solid var(--line);border-radius:9px;
+    background:var(--panel);color:var(--text);font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;
+  }
+  .mob-burger i{font-style:normal;font-size:18px;line-height:1}
+  .mob-topbar .t{font-size:16px;font-weight:800;color:var(--text)}
+  .mob-topbar .n{margin-left:auto;font-size:12px;color:var(--muted)}
+  .mob-mask{
+    display:block;position:fixed;inset:0;z-index:120;
+    background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .22s;
+  }
+  .mob-mask.show{opacity:1;pointer-events:auto}
+  .mob-drawer{
+    display:flex;flex-direction:column;
+    position:fixed;top:0;left:0;bottom:0;z-index:121;
+    width:84vw;max-width:340px;background:var(--bg);
+    border-right:1px solid var(--line);
+    transform:translateX(-100%);transition:transform .26s ease;
+    box-shadow:6px 0 24px rgba(0,0,0,.12);
+  }
+  .mob-drawer.open{transform:translateX(0)}
+  .mob-dh{display:flex;align-items:center;gap:10px;padding:16px 16px 14px;border-bottom:1px solid var(--line)}
+  .mob-dh .mark{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px}
+  .mob-dh b{font-size:16px}
+  .mob-dh small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+  .mob-dh .x{margin-left:auto;border:0;background:transparent;color:var(--muted);font-size:24px;line-height:1;padding:4px 8px;cursor:pointer;font-family:inherit}
+  .mob-body{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:8px 0 40px}
+  .mgroup{border-bottom:1px solid var(--line)}
+  .mgroup-h{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    padding:14px 16px;border:0;background:transparent;color:var(--text);
+    font-size:15.5px;font-weight:800;font-family:inherit;cursor:pointer;
+  }
+  .mgroup-h .gm{width:24px;height:24px;border-radius:6px;background:var(--soft);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+  .mgroup-h .gc{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted)}
+  .mgroup-h .cv{font-size:13px;color:var(--muted);transition:transform .2s}
+  .mgroup.open .cv{transform:rotate(90deg)}
+  .mgroup-l{display:none;padding:0 8px 8px}
+  .mgroup.open .mgroup-l{display:block}
+  .mitem{
+    display:flex;align-items:center;gap:11px;padding:10px 10px;border-radius:9px;
+    text-decoration:none;color:inherit;border:1px solid transparent;
+  }
+  .mitem:active{background:var(--panel);border-color:var(--line)}
+  .mitem .im{width:30px;height:30px;border-radius:8px;flex:none;background:var(--c,var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}
+  .mitem .tt{font-size:14px;font-weight:600;line-height:1.35}
+  .mitem .ar{margin-left:auto;color:var(--muted);font-size:14px}
+  .mob-foot{padding:12px 16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);line-height:1.6}
+}
+@media print{.mob-topbar,.mob-drawer,.mob-mask{display:none!important}}
+
+
+/* ===== INSTBTN-v1 安装到主屏按钮 ===== */
+.inst-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  margin-top:12px;padding:9px 16px;border:1px solid var(--accent);border-radius:9px;
+  background:var(--accent);color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;
+}
+.inst-btn[hidden]{display:none!important}
+.inst-btn .ib{font-size:16px;line-height:1}
+/* 引导弹层 */
+.inst-mask{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:24px}
+.inst-mask.show{display:flex}
+.inst-card{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:16px;max-width:420px;width:100%;padding:24px 22px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.inst-card h3{margin:0 0 6px;font-size:19px}
+.inst-card p{margin:0 0 14px;font-size:13.5px;color:var(--muted);line-height:1.6}
+.inst-card ol{margin:0 0 16px;padding-left:22px;font-size:14.5px;line-height:1.9}
+.inst-card ol b{color:var(--accent)}
+.inst-card .ib-close{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
+@media print{.inst-btn,.inst-mask{display:none!important}}
+
+</style>
+</head>
+<body>
+<!-- MOBNAV-v1 -->
+<div class="mob-topbar"><button class="mob-burger" id="mobBurger" type="button" aria-label="打开分类导航"><i>☰</i> 分类</button><span class="t">价格行为 · 阅读库</span><span class="n">15 本</span></div><div class="mob-mask" id="mobMask"></div><aside class="mob-drawer" id="mobDrawer"><div class="mob-dh"><span class="mark">价</span><div><b>书目导航</b><small>三类 · 点击展开</small></div><button class="x" id="mobClose" type="button" aria-label="关闭">×</button></div><div class="mob-body"><div class="mgroup open"><button class="mgroup-h" type="button"><span class="gm">1</span><span>阿布原始书籍</span><span class="gc">4 本</span><span class="cv">▸</span></button><div class="mgroup-l"><a class="mitem" href="price-action-web/index.html?v8" style="--c:var(--accent)"><span class="im">烛</span><span class="tt">日本蜡烛图交易技术分析</span><span class="ar">›</span></a><a class="mitem" href="advanced-trend-web/index.html?v8" style="--c:var(--accent)"><span class="im">趋</span><span class="tt">高级趋势技术分析</span><span class="ar">›</span></a><a class="mitem" href="wave-range-web/index.html?v8" style="--c:var(--accent)"><span class="im">区</span><span class="tt">高级波段技术分析</span><span class="ar">›</span></a><a class="mitem" href="advanced-reversal-web/index.html?v1" style="--c:var(--accent)"><span class="im">反</span><span class="tt">高级反转技术分析</span><span class="ar">›</span></a></div></div><div class="mgroup"><button class="mgroup-h" type="button"><span class="gm">2</span><span>价格行为相关</span><span class="gc">3 本</span><span class="cv">▸</span></button><div class="mgroup-l"><a class="mitem" href="pa-best-trades-web/index.html?v8" style="--c:var(--accent)"><span class="im">策</span><span class="tt">价格行为最佳交易策略</span><span class="ar">›</span></a><a class="mitem" href="price-action-kbar-web/index.html?v8" style="--c:var(--accent)"><span class="im">K</span><span class="tt">价格行为逐K阅读</span><span class="ar">›</span></a><a class="mitem" href="taifei-web/index.html?v8" style="--c:var(--accent)"><span class="im">太</span><span class="tt">太妃 价格行为基础+进阶</span><span class="ar">›</span></a></div></div><div class="mgroup"><button class="mgroup-h" type="button"><span class="gm">3</span><span>综合阅读</span><span class="gc">8 本</span><span class="cv">▸</span></button><div class="mgroup-l"><a class="mitem" href="ghost-web/index.html?v2" style="--c:var(--accent)"><span class="im">幽</span><span class="tt">华尔街幽灵</span><span class="ar">›</span></a><a class="mitem" href="zero-to-one-web/index.html?v3" style="--c:var(--accent)"><span class="im">0</span><span class="tt">从0到1</span><span class="ar">›</span></a><a class="mitem" href="cz-web/index.html?v1" style="--c:var(--accent)"><span class="im">币</span><span class="tt">币安人生</span><span class="ar">›</span></a><a class="mitem" href="nishi-web/index.html?v1" style="--c:var(--accent)"><span class="im">逆</span><span class="tt">逆势者彼得·蒂尔传</span><span class="ar">›</span></a><a class="mitem" href="money-wars-web/index.html?v1" style="--c:var(--accent)"><span class="im">金</span><span class="tt">金钱风云</span><span class="ar">›</span></a><a class="mitem" href="trade-game-web/index.html?v1" style="--c:var(--accent)"><span class="im">易</span><span class="tt">交易游戏</span><span class="ar">›</span></a><a class="mitem" href="dan-web/index.html?v1" style="--c:var(--accent)"><span class="im">D</span><span class="tt">DAN 文集</span><span class="ar">›</span></a><a class="mitem" href="loser-wins-web/index.html?v1" style="--c:var(--accent)"><span class="im">输</span><span class="tt">最懂输的人才能成为赢家</span><span class="ar">›</span></a></div></div></div><div class="mob-foot">点分类标题展开/收起 · 点书名直接进入阅读 · 再次点「☰ 分类」可关闭</div></aside>
+<div class="wrap">
+  <header class="hero">
+    <div class="mark">价</div>
+    <div>
+      <h1>价格行为 · 阅读库</h1>
+      <p>十五套本地阅读器 · 目录导航 / 主题分组 / 图表索引 / 摘录标记（按原文顺序排列与导出）/ 专注阅读 / 分屏图文对照 / 随手改字（默认纯阅读不挡加粗；选中文字点「✎改字」才临时编辑该段，失焦自动保存并跨设备同步，点「↺ 回到上一版」撤销）</p>
+    </div>
+  </header>
+  <!-- INSTBTN-v1 -->
+<button class="inst-btn" id="instBtn" type="button" hidden><span class="ib">⬇</span> 安装到主屏</button>
+
+  <div class="stats">
+    <div class="stat"><b>15</b><span>本阅读器</span></div>
+    <div class="stat"><b>346</b><span>章节 / 篇</span></div>
+    <div class="stat"><b>1,320</b><span>张图表</span></div>
+    <div class="stat"><b>约 296 万</b><span>字数</span></div>
+  </div>
+
+
+  <!-- ========== 今日阅读统计 ========== -->
+  <section class="today">
+    <div class="today-top">
+      <div>
+        <h2>今日阅读 <span id="tdDate"></span></h2>
+        <p>十五套阅读器合计 · 自动记录在前台阅读的时间</p>
+      </div>
+      <div class="td-stats">
+        <div class="td-stat td-stat-today">
+          <span class="td-stat-label">今日</span>
+          <div class="td-total" id="tdTotal">0 分钟</div>
+        </div>
+        <div class="td-stat td-stat-month">
+          <span class="td-stat-label">本月累计 <em id="tdMonthTag"></em></span>
+          <div class="td-month-total" id="tdMonthTotal">0 分钟</div>
+        </div>
+      </div>
+    </div>
+    <div class="td-grid">
+      <div class="td-books" id="tdBooks"></div>
+      <div class="td-week">
+        <div class="td-week-h">近 7 天趋势</div>
+        <div class="td-bars" id="tdBars"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 类别一：阿布原始书籍 ========== -->
+  <section class="cat">
+    <div class="cat-head">
+      <div class="cat-title"><span class="cat-mark">原</span>阿布原始书籍<span class="cat-en">Al Brooks 原版</span></div>
+      <div class="cat-note">4 本已收录</div>
+    </div>
+    <div class="grid">
+
+      <a class="card" href="price-action-web/index.html?v8" style="--c:#0E9488">
+        <div class="card-head">
+          <div class="mark">烛</div>
+          <h2>日本蜡烛图交易技术分析<span class="sub">价格行为 · 读书笔记</span></h2>
+        </div>
+        <div class="metrics"><span><b>19</b> 章</span><span><b>279</b> 图</span><span><b>28.5 万</b> 字</span></div>
+        <p class="desc">以同名经典为底本，结合课程视频整理。完整的蜡烛图形态与实战要点，图号与正文双向定位，适合逐章精读与回查。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="advanced-trend-web/index.html?v8" style="--c:#1F8A70">
+        <div class="card-head">
+          <div class="mark">趋</div>
+          <h2>高级趋势技术分析<span class="sub">价格行为交易系统之趋势分析</span></h2>
+        </div>
+        <div class="metrics"><span><b>4 篇 26</b> 章</span><span><b>117</b> 图</span><span><b>25.6 万</b> 字</span></div>
+        <p class="desc">四篇分层、篇章双层目录。「本图的深入探讨」与配图同屏对照，专门解决长篇幅趋势分析的图文错位问题。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="wave-range-web/index.html?v8" style="--c:#0E9488">
+        <div class="card-head">
+          <div class="mark">区</div>
+          <h2>高级波段技术分析<span class="sub">价格行为交易系统之区间分析</span></h2>
+        </div>
+        <div class="metrics"><span><b>5 篇 32</b> 章</span><span><b>148</b> 图</span><span><b>33.7 万</b> 字</span></div>
+        <p class="desc">五篇分层，覆盖突破、磁体、回调、交易区间与订单管理。点号图号自动识别，引用段与配图同屏对照；含「本图的深入探讨」，适合系统钻研区间行情。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="advanced-reversal-web/index.html?v1" style="--c:#0E9488">
+        <div class="card-head">
+          <div class="mark">反</div>
+          <h2>高级反转技术分析<span class="sub">价格行为交易系统之反转分析</span></h2>
+        </div>
+        <div class="metrics"><span><b>4 篇 25</b> 章</span><span><b>169</b> 图</span><span><b>35.7 万</b> 字</span></div>
+        <p class="desc">四篇分层：趋势反转、日内交易、开盘时段、总结归纳。篇章双层目录，图表索引与分屏图文对照，适合按反转主题系统钻研。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ========== 类别二：价格行为相关 ========== -->
+  <section class="cat">
+    <div class="cat-head">
+      <div class="cat-title"><span class="cat-mark">相</span>价格行为相关<span class="cat-en">课程与解读</span></div>
+      <div class="cat-note">3 本已收录</div>
+    </div>
+    <div class="grid">
+
+      <a class="card" href="pa-best-trades-web/index.html?v8" style="--c:#12808A">
+        <div class="card-head">
+          <div class="mark">策</div>
+          <h2>价格行为最佳交易策略<span class="sub">26 讲 · 读书笔记</span></h2>
+        </div>
+        <div class="metrics"><span><b>26</b> 讲</span><span><b>123</b> 图</span><span><b>5.8 万</b> 字</span></div>
+        <p class="desc">26 个 Unit 的精选交易策略，按讲次编排。图表采用 U 编号索引，短小精悍，适合反复翻阅、摘录与快速复盘。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="price-action-kbar-web/index.html?v8" style="--c:#0E9488">
+        <div class="card-head">
+          <div class="mark">K</div>
+          <h2>价格行为逐K阅读<span class="sub">逐根K线解读</span></h2>
+        </div>
+        <div class="metrics"><span><b>15</b> 章</span><span><b>173</b> 图</span><span><b>4.9 万</b> 字</span></div>
+        <p class="desc">15 章逐根 K 线解读，从趋势K线、通道、回调、交易区间到日内交易与开盘第一小时。图表按章编号索引，点图分屏左图右文，适合逐图精读。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="taifei-web/index.html?v8" style="--c:#12808A">
+        <div class="card-head">
+          <div class="mark">太</div>
+          <h2>太妃 价格行为基础+进阶<span class="sub">繁体基础 + L01–L20 课程</span></h2>
+        </div>
+        <div class="metrics"><span><b>21</b> 单元</span><span><b>311</b> 图</span><span><b>28.4 万</b> 字</span></div>
+        <p class="desc">繁体基础教材 + 20 讲进阶课程，A/B/C 分段合并为讲、分段作小节。图表按单元编号索引，点图分屏左图右文，体系完整。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ========== 类别三：综合阅读 ========== -->
+  <section class="cat">
+    <div class="cat-head">
+      <div class="cat-title"><span class="cat-mark">读</span>综合阅读<span class="cat-en">非交易类 · 每日阅读任务</span></div>
+      <div class="cat-note">8 本已收录</div>
+    </div>
+    <div class="grid">
+
+      <a class="card" href="ghost-web/index.html?v2" style="--c:#B45309">
+        <div class="card-head">
+          <div class="mark">幽</div>
+          <h2>华尔街幽灵<span class="sub">阿瑟·L.辛普森 · 读书笔记</span></h2>
+        </div>
+        <div class="metrics"><span><b>23</b> 章</span><span><b>13.5 万</b> 字</span></div>
+        <p class="desc">幽灵的三条交易规则之书，以对话体写就。同款阅读器：目录导航 / 全文搜索 / 摘录标记 / 阅读计时与云同步，适合完成每日非交易类阅读任务。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="zero-to-one-web/index.html?v3" style="--c:#B45309">
+        <div class="card-head">
+          <div class="mark">0</div>
+          <h2>从0到1<span class="sub">彼得·蒂尔 · 佟奈尔译</span></h2>
+        </div>
+        <div class="metrics"><span><b>17</b> 章</span><span><b>14.2 万</b> 字</span></div>
+        <p class="desc">从无到有的创新之书。含译者序+前言+15章正文与52张配套插图，支持图文对照、目录导航 / 全文搜索 / 摘录标记 / 阅读计时与云同步。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="cz-web/index.html?v1" style="--c:#B45309">
+        <div class="card-head">
+          <div class="mark">币</div>
+          <h2>币安人生<span class="sub">赵长鹏 · 回忆录</span></h2>
+        </div>
+        <div class="metrics"><span><b>25</b> 章</span><span><b>18 万</b> 字</span></div>
+        <p class="desc">CZ 亲笔回忆录，从赣榆乡村到创建币安。全 25 章含 51 张插图，支持图文对照 / 专注阅读 / 目录搜索 / 摘录标记 / 阅读计时与云同步。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="nishi-web/index.html?v1" style="--c:#1F8A70">
+        <div class="card-head">
+          <div class="mark">逆</div>
+          <h2>逆势者彼得·蒂尔传<span class="sub">马克斯·查夫金 · 人物传记</span></h2>
+        </div>
+        <div class="metrics"><span><b>24</b> 章</span><span><b>23 万</b> 字</span></div>
+        <p class="desc">彼得·蒂尔官方传记，从《龙与地下城》少年到硅谷教父。支持专注阅读 / 目录导航 / 全文搜索 / 摘录标记 / 阅读计时与云同步。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="money-wars-web/index.html?v1" style="--c:#B45309">
+        <div class="card-head">
+          <div class="mark">金</div>
+          <h2>金钱风云<span class="sub">单伟建 · 商业回忆录</span></h2>
+        </div>
+        <div class="metrics"><span><b>27</b> 章</span><span><b>18.5 万</b> 字</span></div>
+        <p class="desc">深发展收购战亲历记，绝处逢生的中国银行业并购故事。含20张插图，支持专注阅读 / 图文对照 / 目录搜索 / 摘录标记 / 阅读计时与云同步。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="trade-game-web/index.html?v1" style="--c:#0E9488">
+        <div class="card-head">
+          <div class="mark">易</div>
+          <h2>交易游戏<span class="sub">吉姆·保尔 · 金融纪实</span></h2>
+        </div>
+        <div class="metrics"><span><b>9</b> 章</span><span><b>20.7 万</b> 字</span></div>
+        <p class="desc">日交易量百兆元的法人操盘手自述，揭露富者愈富的失衡。全9章含章内小节，支持专注阅读 / 目录导航 / 全文搜索 / 摘录标记 / 阅读计时与云同步。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="dan-web/index.html?v1" style="--c:#B45309">
+        <div class="card-head">
+          <div class="mark">D</div>
+          <h2>DAN 文集<span class="sub">Dan Coe · 33 篇精选文章</span></h2>
+        </div>
+        <div class="metrics"><span><b>33</b> 篇</span><span><b>5</b> 大主题</span><span><b>24.6 万</b> 字</span></div>
+        <p class="desc">Dan Coe 关于人生重置、目标意义、财富与技能的文章合集。按 5 大主题分组，含文内小标题与配图；支持主题分组目录 / 专注阅读 / 全文搜索 / 摘录标记 / 阅读计时与云同步。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+      <a class="card" href="loser-wins-web/index.html?v1" style="--c:#B45309">
+        <div class="card-head">
+          <div class="mark">输</div>
+          <h2>最懂输的人才能成为赢家<span class="sub">汤姆·霍加德 · 交易心理</span></h2>
+        </div>
+        <div class="metrics"><span><b>20</b> 章</span><span><b>39</b> 图</span><span><b>11.2 万</b> 字</span></div>
+        <p class="desc">《Best Loser Wins》中文版，从交易心理剖析为何正常思维难以盈利。全 20 章含 39 张配图与小标题，支持专注阅读 / 目录导航 / 全文搜索 / 摘录标记 / 阅读计时与云同步。</p>
+        <span class="go">进入阅读 <span>→</span></span>
+      </a>
+
+    </div>
+  </section>
+
+
+  <!-- ========== 数据备份与同步 ========== -->
+  <section class="today" id="bkHub">
+    <div class="today-top">
+      <div>
+        <h2>数据备份与同步 <span>本机 + 云端双保险</span></h2>
+        <p>阅读时长与摘录保存在浏览器本地；建议开启云同步，并定期导出备份文件</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="bk-dot" id="bkDot"></span><span id="bkMsg" style="font-size:13px;color:var(--muted)">未连接</span>
+      </div>
+    </div>
+    <div class="row" style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="bk-btn primary" id="bkExport">导出备份到文件</button>
+      <button class="bk-btn" id="bkImport">从文件恢复</button>
+      <button class="bk-btn" id="bkSync">立即云同步</button>
+      <button class="bk-btn" id="bkMore">同步设置</button>
+    </div>
+    <div class="stat-line" id="bkStat"></div>
+  </section>
+
+  <div class="foot">
+    <b>使用提示：</b>每本书内点击图片可进入全屏分屏（左图右文），支持 ← → 翻图、Esc 退出；选中文字可加粗或四色标记，摘录自动保存在本机浏览器，导出为 Markdown。<br>
+    <b>阅读时长：</b>打开阅读器自动计时，切到后台或闲置 90 秒会暂停；顶栏「今日」可看各书分布与近 7 天趋势，本页顶部汇总全部阅读器。<br>
+    <b>返回总目录：</b>每本书顶栏右上角都有「书库」按钮，一键回到本页。
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY='pa-reading-time-v1', NAMES={'price-action-web':'日本蜡烛图','advanced-trend-web':'高级趋势','wave-range-web':'高级波段','pa-best-trades-web':'最佳交易策略','price-action-kbar-web':'逐K阅读','taifei-web':'太妃课程','ghost-web':'华尔街幽灵','zero-to-one-web':'从0到1','cz-web':'币安人生','nishi-web':'逆势者彼得·蒂尔传','money-wars-web':'金钱风云','trade-game-web':'交易游戏','dan-web':'DAN 文集','loser-wins-web':'最懂输的人才能成为赢家'}, COLORS={'price-action-web':'#0E9488','advanced-trend-web':'#1F8A70','wave-range-web':'#0E9488','pa-best-trades-web':'#12808A','price-action-kbar-web':'#0E9488','taifei-web':'#12808A','ghost-web':'#B45309','zero-to-one-web':'#B45309','cz-web':'#B45309','nishi-web':'#1F8A70','money-wars-web':'#B45309','trade-game-web':'#0E9488','dan-web':'#B45309','loser-wins-web':'#B45309','advanced-reversal-web':'#0E9488'}, store={};
+  try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){}
+  function dayStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function fmt(ms){
+    var s=Math.floor((ms||0)/1000);
+    if(s<60)return s+' 秒';
+    var m=Math.floor(s/60);
+    if(m<60)return m+' 分钟';
+    var h=Math.floor(m/60),mm=m%60;
+    return mm?(h+' 小时 '+mm+' 分'):(h+' 小时');
+  }
+  function paint(){
+    // 每次重读最新数据：Gist 同步/其它标签页写入后能及时反映
+    try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){}
+    var d=new Date(), key=dayStr(d), obj=store[key]||{};
+    document.getElementById('tdDate').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日';
+    var total=0; Object.keys(obj).forEach(function(k){total+=obj[k]||0;});
+    document.getElementById('tdTotal').textContent=fmt(total);
+    // ---- 月度累计：按 YYYY-MM 归类，跨月自动分隔 ----
+    var curMonth=key.slice(0,7), prevMonthDate=new Date(d.getFullYear(),d.getMonth()-1,1);
+    var prevMonth=dayStr(prevMonthDate).slice(0,7);
+    var mSum={}, mDays={};
+    Object.keys(store).forEach(function(day){
+      var mk=String(day).slice(0,7);
+      if(!/^\d{4}-\d{2}$/.test(mk)) return;          // 跳过异常日期键
+      var o=store[day]||{}, daySum=0;
+      Object.keys(o).forEach(function(b){daySum+=(+o[b]||0);});
+      if(daySum>0){ mSum[mk]=(mSum[mk]||0)+daySum; mDays[mk]=(mDays[mk]||0)+1; }
+    });
+    var mt=mSum[curMonth]||0, mdays=mDays[curMonth]||0;
+    document.getElementById('tdMonthTotal').textContent=mt>0?fmt(mt):'暂无记录';
+    document.getElementById('tdMonthTag').textContent=(d.getMonth()+1)+'月';
+    var mEl=document.getElementById('tdMonthTotal');
+    var pv=prevMonth?fmt(mSum[prevMonth]||0):'—';
+    mEl.title=d.getFullYear()+'年'+(d.getMonth()+1)+'月 · 累计 '+fmt(mt)+' · '+mdays+' 天有阅读'+(prevMonth?'\n上月('+(+prevMonth.slice(5))+'月)：'+pv:'');
+    var rows=Object.keys(obj).filter(function(k){return obj[k]>0;}).sort(function(a,b){return obj[b]-obj[a];});
+    document.getElementById('tdBooks').innerHTML=rows.map(function(k){
+      return '<div class="td-row"><i class="dot" style="background:'+(COLORS[k]||'#0E9488')+'"></i><span>'+(NAMES[k]||k)+'</span><b>'+fmt(obj[k])+'</b></div>';
+    }).join('')||'<div class="td-row"><span>今天还没有阅读记录，点开任意一本开始吧</span><b>—</b></div>';
+    var days=[];
+    for(var i=6;i>=0;i--){
+      var dd=new Date(); dd.setDate(dd.getDate()-i);
+      var k=dayStr(dd), sum=0, o=store[k]||{};
+      Object.keys(o).forEach(function(x){sum+=o[x]||0;});
+      days.push({key:k,sum:sum,label:(dd.getMonth()+1)+'/'+dd.getDate()});
+    }
+    var mx=Math.max.apply(null,days.map(function(x){return x.sum;}).concat([1]));
+    document.getElementById('tdBars').innerHTML=days.map(function(x,i){
+      var h=Math.max(3,Math.round(x.sum/mx*68));
+      return '<div class="td-bar'+(i===6?' today':'')+'" title="'+x.key+' '+fmt(x.sum)+'"><i style="height:'+h+'px"></i><em>'+x.label+'</em></div>';
+    }).join('');
+  }
+  paint();
+  setInterval(paint,30000);
+  window.addEventListener('focus',paint);
+})();
+</script>
+
+<script>
+/* pa-backup-sync-v1 数据备份 + Gist 云同步 v1 ===== */
+(function(){
+if(window.__PA_BK) return; window.__PA_BK=1;
+var KEY_T='pa-reading-time-v1', KEY_E='pa-excerpts-v1', KEY_D='pa-excerpts-tomb-v1';
+var KEY_CFG='pa-sync-cfg-v1', GFILE='pa_reader_data.json';
+var DEF_TOKEN='', DEF_GIST='c6615575d788f7371bcd8fb4494fedc8';
+var NAMES={'price-action-web':'日本蜡烛图','advanced-trend-web':'高级趋势','wave-range-web':'高级波段','pa-best-trades-web':'最佳交易策略','price-action-kbar-web':'逐K阅读','taifei-web':'太妃课程','ghost-web':'华尔街幽灵','zero-to-one-web':'从0到1','cz-web':'币安人生','nishi-web':'逆势者彼得·蒂尔传','money-wars-web':'金钱风云','trade-game-web':'交易游戏','dan-web':'DAN 文集','loser-wins-web':'最懂输的人才能成为赢家','advanced-reversal-web':'高级反转'};
+var isHub=!!document.getElementById('bkHub');
+var cfg={}; try{cfg=JSON.parse(localStorage.getItem(KEY_CFG)||'{}')||{}}catch(e){}
+if(cfg.token===undefined) cfg.token=DEF_TOKEN;
+if(cfg.gistId===undefined) cfg.gistId=DEF_GIST;
+if(cfg.enabled===undefined) cfg.enabled=true;
+function saveCfg(){try{localStorage.setItem(KEY_CFG,JSON.stringify(cfg));}catch(e){}}
+
+function readLS(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v;}catch(e){return d;}}
+function getT(){return readLS(KEY_T,{});}
+function getE(){return readLS(KEY_E,[]);}
+function getD(){return readLS(KEY_D,[]);}
+function setT(v){try{localStorage.setItem(KEY_T,JSON.stringify(v));}catch(e){}}
+function setE(v){try{localStorage.setItem(KEY_E,JSON.stringify(v));}catch(e){}}
+function setD(v){try{localStorage.setItem(KEY_D,JSON.stringify(v));}catch(e){}}
+
+/* 合并：阅读时长按 天+书 取 max；删除墓碑按 id 取最新；摘录按 id 合并、 tomb 中的剔除 */
+/* MERGEFIX-v1: 摘录对象用 time 字段，兼容读取 t/time */
+function excTime(x){return (x&&(x.t||x.time))||0;}
+function mergeData(a){
+  suppressPush=true;
+  try{
+  var t=getT(), e=getE(), d=getD();
+  if(a.readingTime&&typeof a.readingTime==='object'){
+    Object.keys(a.readingTime).forEach(function(day){
+      if(!t[day]) t[day]={};
+      var src=a.readingTime[day]||{};
+      Object.keys(src).forEach(function(k){ t[day][k]=Math.max(t[day][k]||0,src[k]||0); });
+    });
+  }
+  var dm={}; d.forEach(function(x){dm[x.id]=Math.max(dm[x.id]||0,x.t||0);});
+  (a.excTomb||[]).forEach(function(x){dm[x.id]=Math.max(dm[x.id]||0,x.t||0);});
+  var em={}; e.forEach(function(x){
+    if(!x||!x.id) return;
+    if((dm[x.id]||0)>=excTime(x)) return; /* 本地项已被墓碑删除 */
+    em[x.id]=x;
+  });
+  (a.excerpts||[]).forEach(function(x){
+    if(!x||!x.id) return;
+    if((dm[x.id]||0)>=excTime(x)) return; /* 云端项已被墓碑删除 */
+    if(!em[x.id] || excTime(x)>excTime(em[x.id])) em[x.id]=x;
+  });
+  setT(t); setD(Object.keys(dm).map(function(id){return {id:id,t:dm[id]};}));
+  setE(Object.keys(em).map(function(id){return em[id];}));
+  }finally{ suppressPush=false; }
+}
+/* ===== LOCALSNAP-v1 本地自动快照（保险层，独立于云同步） ===== */
+(function(){
+  if(window.__PA_LOCALSNAP) return; window.__PA_LOCALSNAP=1;
+  var SNAPKEY='pa-local-snaps-v1', CFGKEY='pa-sync-cfg-v1', MAX=5;
+  function lcfg(){
+    try{var c=JSON.parse(localStorage.getItem(CFGKEY)||'{}')||{};
+      if(c.localSnap===undefined) c.localSnap=true; return c;
+    }catch(e){return {localSnap:true};}
+  }
+  function lread(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v;}catch(e){return d;}}
+  function current(){
+    try{ if(typeof snapshot==='function') return snapshot(); }catch(e){}
+    return {v:1,app:'pa-reader',exportedAt:new Date().toISOString(),
+      readingTime:lread('pa-reading-time-v1',{}),excerpts:lread('pa-excerpts-v1',[]),
+      excTomb:lread('pa-excerpts-tomb-v1',[]),corrections:lread('pa-corrections-v1',{})};
+  }
+  function getSnaps(){return lread(SNAPKEY,[]);}
+  function setSnaps(a){try{localStorage.setItem(SNAPKEY,JSON.stringify(a));}catch(e){}}
+  function saveSnap(force){
+    if(!lcfg().localSnap) return false;
+    var d=current(), snaps=getSnaps();
+    var payload=JSON.stringify([d.excerpts||[],d.corrections||{},d.readingTime||{},d.excTomb||[]]);
+    if(snaps[0] && snaps[0].sig===payload && !force) return false;
+    snaps.unshift({ts:Date.now(),sig:payload,data:d});
+    if(snaps.length>MAX) snaps=snaps.slice(0,MAX);
+    setSnaps(snaps);
+    return true;
+  }
+  var _snapTimer=null;
+  function scheduleSnap(){clearTimeout(_snapTimer);_snapTimer=setTimeout(function(){saveSnap(false);},1200);}
+  // 1) 摘录等数据写入：包装 setItem 捕获（含本页直接写入）
+  var _origSI=Storage.prototype.setItem;
+  Storage.prototype.setItem=function(k,v){
+    _origSI.call(this,k,v);
+    if(k==='pa-excerpts-v1'||k==='pa-corrections-v1'||k==='pa-reading-time-v1'||k==='pa-excerpts-tomb-v1') scheduleSnap();
+  };
+  // 2) 页面刷新统一出口
+  window.addEventListener('pa-data-changed',scheduleSnap);
+  // 3) 首次基线
+  setTimeout(function(){ if(getSnaps().length===0) saveSnap(true); },2500);
+  window.PA_SNAP={
+    list:getSnaps,
+    save:function(){return saveSnap(true);},
+    restore:function(idx){
+      var s=getSnaps()[idx]; if(!s) return false; var d=s.data;
+      try{
+        if(d.readingTime)localStorage.setItem('pa-reading-time-v1',JSON.stringify(d.readingTime));
+        if(d.excerpts)localStorage.setItem('pa-excerpts-v1',JSON.stringify(d.excerpts));
+        if(d.excTomb)localStorage.setItem('pa-excerpts-tomb-v1',JSON.stringify(d.excTomb));
+        if(d.corrections)localStorage.setItem('pa-corrections-v1',JSON.stringify(d.corrections));
+      }catch(e){return false;}
+      try{ if(typeof refresh==='function') refresh(); }catch(e){}
+      return true;
+    }
+  };
+  function enh(){
+    var panel=document.getElementById('bkPanel'); if(!panel||panel.dataset.snapUI) return;
+    panel.dataset.snapUI='1';
+    var c=lcfg(), snaps=getSnaps();
+    function fmt(ts){var d=new Date(ts);return d.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}
+    var box=document.createElement('div');
+    box.style.cssText='margin-top:14px;padding-top:12px;border-top:1px solid var(--line)';
+    var html='<div class="row" style="font-size:13px;font-weight:700">🛟 本地自动快照（保险层）</div>'+
+      '<div class="row"><label style="font-size:12.5px"><input type="checkbox" id="snapOn" '+(c.localSnap?'checked':'')+'> 数据变化时自动存快照（最多5份）</label></div>'+
+      '<p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:6px 0">'+
+      '快照仅存本机浏览器，不联网。同步万一看错/丢失，点下方时间可回滚到出错前。<br>'+
+      '<b>换电脑</b>：用顶栏「导出备份」把数据存成文件带走，在新电脑「导入」即可恢复——快照本身跨不了设备。</p>'+
+      '<div class="row"><button class="bk-btn" id="snapNow">立即存一份</button></div>';
+    if(snaps.length){
+      html+='<div style="font-size:12px;margin-top:8px">最近快照（点「回滚」恢复）：</div>';
+      snaps.forEach(function(s,i){
+        var cnt=(s.data&&s.data.excerpts)? s.data.excerpts.length:'?';
+        html+='<div class="row" style="justify-content:space-between;font-size:12px">'+
+          '<span>'+fmt(s.ts)+' · 摘录'+cnt+'条'+(i===0?' · 最新':'')+'</span>'+
+          '<button class="bk-btn snap-restore" data-i="'+i+'">回滚</button></div>';
+      });
+    } else {
+      html+='<div style="font-size:12px;color:var(--muted);margin-top:8px">暂无快照（首次使用约几秒后自动生成）</div>';
+    }
+    box.innerHTML=html;
+    var firstRow=panel.querySelector('.row'); if(firstRow) firstRow.parentNode.insertBefore(box,firstRow); else panel.appendChild(box);
+    document.getElementById('snapOn').onchange=function(){
+      var cc=lcfg(); cc.localSnap=this.checked;
+      try{localStorage.setItem(CFGKEY,JSON.stringify(cc));}catch(e){}
+      if(this.checked) window.PA_SNAP.save();
+    };
+    document.getElementById('snapNow').onclick=function(){
+      window.PA_SNAP.save();
+      try{ if(typeof closePanel==='function')closePanel(); if(typeof openPanel==='function')openPanel(); }catch(e){}
+    };
+    box.querySelectorAll('.snap-restore').forEach(function(btn){
+      btn.onclick=function(){
+        var i=+btn.getAttribute('data-i');
+        if(!window.confirm('确定回滚到该快照？当前摘录/修改会被该快照覆盖（快照本身仍保留）。'))return;
+        if(window.PA_SNAP.restore(i)){
+          try{ if(typeof push==='function') push(); }catch(e){}
+          try{ if(typeof closePanel==='function')closePanel(); if(typeof openPanel==='function')openPanel(); }catch(e){}
+        }
+      };
+    });
+  }
+  var mo=new MutationObserver(function(){ if(document.getElementById('bkPanel')) enh(); });
+  mo.observe(document.body,{childList:true,subtree:true});
+})();
+function snapshot(){
+  return {v:1,app:'pa-reader',exportedAt:new Date().toISOString(),readingTime:getT(),excerpts:getE(),excTomb:getD()};
+}
+function refresh(){
+  if(typeof renderNotes==='function'){try{renderNotes();}catch(e){}}
+  if(typeof updateNoteCount==='function'){try{updateNoteCount();}catch(e){}}
+  window.dispatchEvent(new CustomEvent('pa-data-changed'));
+}
+
+/* --- UI 状态 --- */
+function dot(cls,msg,err){var el=document.getElementById('bkDot');if(el)el.className='bk-dot'+(cls?' '+cls:'');var m=document.getElementById('bkMsg');if(m){m.textContent=msg;m.className='bk-msg'+(err?' err':'');}}
+function stat(){
+  var el=document.getElementById('bkStat'); if(!el)return;
+  var t=getT(),days=Object.keys(t).length,total=0;
+  Object.keys(t).forEach(function(d){Object.keys(t[d]).forEach(function(k){total+=t[d][k]||0;});});
+  el.innerHTML='摘录 <b>'+getE().length+'</b> 条 · 阅读记录 <b>'+days+'</b> 天 · 累计 <b>'+Math.round(total/60000)+'</b> 分钟'+
+    ' · 云同步 <b>'+(cfg.enabled?'已开启':'已关闭')+'</b> · Gist <code>'+(cfg.gistId||'未绑定')+'</code>';
+}
+
+/* --- 导出 / 导入 --- */
+function doExport(){
+  var data=JSON.stringify(snapshot(),null,2);
+  var blob=new Blob([data],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='PA阅读数据备份_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+  dot('ok','已导出备份文件，请保存到 D 盘安全位置');
+}
+function doImport(){document.getElementById('bkFile').click();}
+function handleFile(ev){
+  var f=ev.target.files[0]; if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var d=JSON.parse(r.result);
+      if(!d||(!d.readingTime&&!d.excerpts)) throw new Error('文件格式不对');
+      var mode=window.confirm('点「确定」= 合并导入（保留双方数据，推荐）\n点「取消」= 覆盖导入（用文件完全替换本机数据）');
+      if(mode){ mergeData(d); }
+      else { if(d.readingTime)setT(d.readingTime); if(d.excerpts)setE(d.excerpts); if(d.excTomb)setD(d.excTomb); }
+      refresh(); stat(); dot('ok','导入成功：摘录 '+getE().length+' 条'); push();
+      closePanel();
+    }catch(err){dot('err','导入失败：'+err.message,true);}
+  };
+  r.readAsText(f); ev.target.value='';
+}
+
+/* --- Gist 同步 --- */
+function api(method,path,body){
+  var opt={method:method,headers:{'Authorization':'Bearer '+cfg.token,'Accept':'application/vnd.github+json','User-Agent':'pa-reader'}};
+  if(body){opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(body);}
+  return fetch('https://api.github.com'+path,opt).then(function(r){
+    if(r.status===401) throw new Error('Token 失效');
+    if(r.status===403) throw new Error('请求被限流');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  });
+}
+var busy=false, dirty=false, timer=null, lastOk=0, suppressPush=false;
+function pull(silent){
+  if(!cfg.enabled||!cfg.token||!cfg.gistId){if(!silent)dot('err','未开启同步',true);return Promise.resolve(false);}
+  if(busy)return Promise.resolve(false); busy=true; dot('busy','正在从云端读取…');
+  return api('GET','/gists/'+cfg.gistId).then(function(g){
+    var f=g.files&&g.files[GFILE];
+    if(!f) throw new Error('云端文件不存在');
+    var content=f.truncated?null:f.content;
+    var pr=content?Promise.resolve(content):fetch(f.raw_url).then(function(r){return r.text();});
+    return pr.then(function(txt){
+      var d=JSON.parse(txt); mergeData(d); refresh(); stat();
+      lastOk=Date.now(); dot('ok','已同步 · '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}));
+      return true;
+    });
+  }).catch(function(e){dot('err','云端读取失败：'+e.message+'（本机数据不受影响）',true);return false;})
+    .then(function(ok){busy=false;return ok;});
+}
+function push(){
+  if(!cfg.enabled||!cfg.token||!cfg.gistId)return Promise.resolve(false);
+  if(busy){dirty=true;return Promise.resolve(false);}
+  busy=true; dot('busy','正在保存到云端…');
+  var files={}; files[GFILE]={content:JSON.stringify(snapshot(),null,2)};
+  return api('PATCH','/gists/'+cfg.gistId,{files:files}).then(function(){
+    lastOk=Date.now(); dirty=false; dot('ok','已保存 · '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})); return true;
+  }).catch(function(e){dirty=true;dot('err','保存失败：'+e.message+'（已排队重试）',true);return false;})
+    .then(function(ok){busy=false;return ok;});
+}
+function schedulePush(){dirty=true;clearTimeout(timer);timer=setTimeout(function(){if(dirty)push();},800);}
+function syncNow(){ pull(true).then(function(ok){ if(ok&&dirty) return push(); }); }
+
+/* 数据变化时自动推送：监听两种 storage 写入（同页通过包装 setItem） */
+var _si=Storage.prototype.setItem;
+Storage.prototype.setItem=function(k,v){
+  _si.call(this,k,v);
+  if((k===KEY_E||k===KEY_T||k===KEY_D)&&cfg.enabled&&!suppressPush) schedulePush();
+};
+window.addEventListener('pa-data-changed',function(){stat();});
+window.addEventListener('storage',function(e){if(cfg.enabled&&(e.key===KEY_E||e.key===KEY_T||e.key===KEY_D)){pull(true);}});
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&cfg.enabled){pull(true);}});
+
+/* --- 设置面板 --- */
+function panelHTML(){
+  var days=Object.keys(getT()).length;
+  return '<div class="bk-mask" id="bkMask"></div><div class="bk-panel" id="bkPanel">'+
+    '<h3>数据备份与云同步设置</h3>'+
+    '<p><b>本机</b>：阅读时长与摘录存在浏览器本地，清缓存/换浏览器会丢。<br>'+
+    '<b>云同步</b>：用私有 Gist 自动保存，换设备也能取回（同一 Token + Gist ID）。<br>'+
+    '<b>在线版首次使用</b>：出于安全，本页不内置 Token。请在下方填入你的 GitHub Token 并保存，摘录/修改即可跨设备同步（只需填一次，之后存本机）。<br><b>Gist ID</b> 已预填，一般无需改。</p>'+
+    '<div class="row"><label style="font-size:13px"><input type="checkbox" id="bkOn" '+(cfg.enabled?'checked':'')+'> 开启云同步</label></div>'+
+    '<div class="row"><input type="password" id="bkToken" placeholder="GitHub Token" value="'+(cfg.token||'')+'" style="flex:1;min-width:220px;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px"></div>'+
+    '<div class="row"><input type="text" id="bkGist" placeholder="Gist ID" value="'+(cfg.gistId||'')+'" style="flex:1;min-width:220px;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px"></div>'+
+    '<div class="row"><button class="bk-btn primary" id="bkSave">保存设置</button>'+
+    '<button class="bk-btn" id="bkTest">测试并立即同步</button>'+
+    '<button class="bk-btn" id="bkClose">关闭</button></div>'+
+    '<div class="stat-line">当前：摘录 '+getE().length+' 条 · '+days+' 天阅读记录'+(lastOk?(' · 上次同步 '+new Date(lastOk).toLocaleString('zh-CN')):'')+'</div>'+
+    '</div>';
+}
+function openPanel(){
+  if(document.getElementById('bkPanel'))return;
+  var d=document.createElement('div'); d.innerHTML=panelHTML(); document.body.appendChild(d);
+  document.getElementById('bkMask').classList.add('show');
+  document.getElementById('bkPanel').classList.add('show');
+  document.getElementById('bkClose').onclick=closePanel;
+  document.getElementById('bkMask').onclick=closePanel;
+  document.getElementById('bkSave').onclick=function(){
+    cfg.enabled=document.getElementById('bkOn').checked;
+    cfg.token=document.getElementById('bkToken').value.trim();
+    cfg.gistId=document.getElementById('bkGist').value.trim();
+    saveCfg(); stat(); closePanel(); dot(cfg.enabled?'ok':'','设置已保存'); if(cfg.enabled)syncNow();
+  };
+  document.getElementById('bkTest').onclick=function(){
+    cfg.enabled=true; cfg.token=document.getElementById('bkToken').value.trim(); cfg.gistId=document.getElementById('bkGist').value.trim();
+    saveCfg(); pull(true).then(function(ok){if(ok)return push();});
+  };
+}
+function closePanel(){var p=document.getElementById('bkPanel');if(p)p.parentNode.removeChild(p.parentNode);var m=document.getElementById('bkMask');if(m)m.parentNode.removeChild(m);}
+
+/* --- 初始化 --- */
+function init(){
+  var st=document.createElement('style'); st.textContent="\n/* ===== data backup & cloud sync ===== */\n.bk-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 12px;border-top:1px solid var(--line);font-size:12px}\n.bk-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}\n.bk-btn:hover{border-color:var(--accent);color:var(--accent)}\n.bk-btn.primary{border-color:var(--accent);color:var(--accent)}\n.bk-dot{width:7px;height:7px;border-radius:50%;background:var(--line);flex:none}\n.bk-dot.ok{background:#16a34a}.bk-dot.err{background:#dc2626}.bk-dot.busy{background:#f59e0b}\n.bk-msg{color:var(--muted);flex:1;min-width:120px;line-height:1.4}\n.bk-msg.err{color:#dc2626}\n.bk-panel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:400;width:min(520px,94vw);max-height:86vh;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 18px 60px rgba(0,0,0,.22);display:none}\n.bk-panel.show{display:block}\n.bk-panel h3{font-size:17px;margin-bottom:6px}\n.bk-panel p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px}\n.bk-panel .row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}\n.bk-panel .bk-btn{padding:8px 13px;font-size:13px}\n.bk-panel code{background:var(--panel);padding:2px 6px;border-radius:4px;font-size:12px;word-break:break-all}\n.bk-panel .stat-line{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:12px}\n.bk-mask{position:fixed;inset:0;z-index:399;background:rgba(0,0,0,.35);display:none}\n.bk-mask.show{display:block}\n@media print{.bk-bar,.bk-panel,.bk-mask{display:none!important}}\n"; document.head.appendChild(st);
+  if(!isHub){
+    if(typeof bkFileInit==='undefined'){
+      var fi=document.createElement('input'); fi.type='file'; fi.accept='.json,application/json'; fi.id='bkFile'; fi.style.display='none';
+      fi.addEventListener('change',handleFile); document.body.appendChild(fi); window.bkFileInit=1;
+    }
+    var bar=document.getElementById('bkBar');
+    if(bar){
+      document.getElementById('bkExport').onclick=doExport;
+      document.getElementById('bkImport').onclick=doImport;
+      document.getElementById('bkSync').onclick=syncNow;
+      document.getElementById('bkMore').onclick=openPanel;
+      document.getElementById('rtPop').appendChild(bar);
+    }
+  }else{
+    var fi2=document.createElement('input'); fi2.type='file'; fi2.accept='.json,application/json'; fi2.id='bkFile'; fi2.style.display='none';
+    fi2.addEventListener('change',handleFile); document.body.appendChild(fi2);
+    document.getElementById('bkExport').onclick=doExport;
+    document.getElementById('bkImport').onclick=doImport;
+    document.getElementById('bkSync').onclick=syncNow;
+    document.getElementById('bkMore').onclick=openPanel;
+    stat();
+  }
+  if(cfg.enabled&&cfg.token&&cfg.gistId){
+    dot('busy','正在连接云端…'); pull(true);
+    setInterval(function(){if(!document.hidden)pull(true);},45000);
+  }else{ dot('','云同步未开启'); }
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+
+window.PA_BACKUP={export:doExport,import:doImport,sync:syncNow,pull:pull,push:push,snapshot:snapshot,merge:mergeData,config:cfg,stat:stat};
+})();
+</script>
+<script>
+/* PWA-v1 service worker 注册（仅 http/https，file:// 下静默跳过） */
+(function(){if(!('serviceWorker' in navigator))return;if(location.protocol!=='http:'&&location.protocol!=='https:')return;window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(function(){});});})();
+</script>
+
+<script>
+/* MOBNAV-v1 手机端三类折叠侧边栏 */
+(function(){
+  if(window.__MOBNAV) return; window.__MOBNAV=1;
+  var burger=document.getElementById('mobBurger'), drawer=document.getElementById('mobDrawer'),
+      mask=document.getElementById('mobMask'), close=document.getElementById('mobClose');
+  if(!burger||!drawer||!mask) return;
+  function open(){drawer.classList.add('open');mask.classList.add('show');document.body.style.overflow='hidden';}
+  function shut(){drawer.classList.remove('open');mask.classList.remove('show');document.body.style.overflow='';}
+  burger.addEventListener('click',function(){drawer.classList.contains('open')?shut():open();});
+  mask.addEventListener('click',shut);
+  if(close) close.addEventListener('click',shut);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')shut();});
+  // 分组折叠
+  Array.prototype.forEach.call(document.querySelectorAll('.mgroup-h'),function(h){
+    h.addEventListener('click',function(){h.parentNode.classList.toggle('open');});
+  });
+  // 点书名跳转后收起（hash 变化/页面卸载前）
+  Array.prototype.forEach.call(document.querySelectorAll('.mitem'),function(a){
+    a.addEventListener('click',function(){setTimeout(shut,120);});
+  });
+})();
+</script>
+
+<div class="inst-mask" id="instMask"><div class="inst-card"><h3>安装到主屏</h3><p>在手机浏览器里按下面步骤操作，即可像 App 一样全屏打开、离线也能阅读：</p><ol id="instSteps"></ol><button class="ib-close" id="instClose" type="button">知道了</button></div></div>
+
+<script>
+/* INSTBTN-v1 安装到主屏按钮 */
+(function(){
+  if(window.__INSTBTN) return; window.__INSTBTN=1;
+  var btn=document.getElementById('instBtn'), mask=document.getElementById('instMask'),
+      steps=document.getElementById('instSteps'), close=document.getElementById('instClose');
+  if(!btn||!mask) return;
+  // 已在独立模式运行（已安装）→ 不显示按钮
+  var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone===true;
+  if(standalone){ btn.hidden=true; return; }
+
+  var deferred=null;
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+
+  function showBtn(){ btn.hidden=false; }
+  function guide(){
+    if(isIOS){
+      steps.innerHTML='<li>点屏幕底部中间的 <b>分享</b> 按钮（方框向上箭头）</li>'+
+                      '<li>在弹出菜单里向下滑，找到并点 <b>添加到主屏幕</b></li>'+
+                      '<li>右上角点 <b>添加</b> 即可</li>';
+    }else{
+      steps.innerHTML='<li>点浏览器右上角的 <b>⋮ 菜单</b></li>'+
+                      '<li>选择 <b>安装应用</b> 或 <b>添加到主屏幕</b></li>'+
+                      '<li>确认即可</li>';
+    }
+    mask.classList.add('show');
+  }
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferred=e; showBtn();
+  });
+  btn.addEventListener('click', function(){
+    if(deferred){
+      deferred.prompt();
+      deferred.userChoice.then(function(){ deferred=null; });
+    }else{
+      guide();  // iOS 或不支持时给图文引导
+    }
+  });
+  close.addEventListener('click', function(){ mask.classList.remove('show'); });
+  mask.addEventListener('click', function(e){ if(e.target===mask) mask.classList.remove('show'); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') mask.classList.remove('show'); });
+  // 兜底：若 3 秒内没触发 beforeinstallprompt（多半是 iOS），也把按钮显示出来用于引导
+  setTimeout(function(){ if(btn.hidden) showBtn(); }, 3000);
+})();
+</script>
+
+</body>
+</html>
