@@ -3,7 +3,7 @@
  * 导航 network-first（拿到最新，断网回退缓存）；跨域（Gist 同步 api.github.com）不拦截。
  * 所有 fetch/cache 均静默兜底，避免控制台报错干扰阅读。
  */
-const CACHE = 'pa-library-pwa-v2'; /* SW404-v1 */
+const CACHE = 'pa-library-pwa-v3'; /* SW404-v1 / CACHEBUMP-v3 强制清理旧缓存, 加载新清洗代码 */
 const SHELL = [
   './',
   './index.html',
