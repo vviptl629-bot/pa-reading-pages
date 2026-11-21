@@ -745,7 +745,25 @@ renderNotes();
   function dayStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function today(){return dayStr(new Date());}
   function bucket(day){if(!store[day])store[day]={};return store[day];}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+  var lastSaved={}; try{lastSaved=JSON.parse(JSON.stringify(store));}catch(e){lastSaved={}} /* TIMEMERGE-v1 */
+  function save(){ /* TIMEMERGE-v1 会话增量叠加到最新localStorage(含云端pull)，避免覆盖/丢失 */
+    try{
+      var disk={}; try{disk=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){disk={}}
+      var merged={};
+      Object.keys(disk).forEach(function(d){ merged[d]=Object.assign({},disk[d]||{}); });
+      Object.keys(store).forEach(function(d){
+        if(!merged[d]) merged[d]={};
+        var ss=store[d]||{}, ls=lastSaved[d]||{};
+        Object.keys(ss).forEach(function(bk){
+          var delta=(ss[bk]||0)-(ls[bk]||0);
+          if(delta>0) merged[d][bk]=(merged[d][bk]||0)+delta;
+        });
+      });
+      store=merged;
+      localStorage.setItem(KEY,JSON.stringify(store));
+      lastSaved=JSON.parse(JSON.stringify(store));
+    }catch(e){ try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e2){} }
+  }
   function fmt(ms){
     var s=Math.floor((ms||0)/1000);
     if(s<60)return s+' 秒';
