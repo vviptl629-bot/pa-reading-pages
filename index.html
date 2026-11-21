@@ -839,10 +839,10 @@ function syncNow(){ pull(true).then(function(ok){ if(ok&&dirty) return push(); }
 var _si=Storage.prototype.setItem;
 Storage.prototype.setItem=function(k,v){
   _si.call(this,k,v);
-  if((k===KEY_E||k===KEY_T||k===KEY_D)&&cfg.enabled&&!suppressPush) schedulePush();
+  if((k===KEY_E||k===KEY_T||k===KEY_D||k===KEY_C)&&cfg.enabled&&!suppressPush) schedulePush(); /* HUBKEYC-v1 */
 };
 window.addEventListener('pa-data-changed',function(){stat();});
-window.addEventListener('storage',function(e){if(cfg.enabled&&(e.key===KEY_E||e.key===KEY_T||e.key===KEY_D)){pull(true);}});
+window.addEventListener('storage',function(e){if(cfg.enabled&&(e.key===KEY_E||e.key===KEY_T||e.key===KEY_D||e.key===KEY_C)){pull(true);}}); /* HUBKEYC-v1 */
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&cfg.enabled){pull(true);}});
 
 /* --- 设置面板 --- */
