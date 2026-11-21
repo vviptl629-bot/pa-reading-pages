@@ -228,25 +228,6 @@ body{
 @media print{.mob-topbar,.mob-drawer,.mob-mask{display:none!important}}
 
 
-/* ===== INSTBTN-v1 安装到主屏按钮 ===== */
-.inst-btn{
-  display:inline-flex;align-items:center;gap:7px;
-  margin-top:12px;padding:9px 16px;border:1px solid var(--accent);border-radius:9px;
-  background:var(--accent);color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;
-}
-.inst-btn[hidden]{display:none!important}
-.inst-btn .ib{font-size:16px;line-height:1}
-/* 引导弹层 */
-.inst-mask{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:24px}
-.inst-mask.show{display:flex}
-.inst-card{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:16px;max-width:420px;width:100%;padding:24px 22px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
-.inst-card h3{margin:0 0 6px;font-size:19px}
-.inst-card p{margin:0 0 14px;font-size:13.5px;color:var(--muted);line-height:1.6}
-.inst-card ol{margin:0 0 16px;padding-left:22px;font-size:14.5px;line-height:1.9}
-.inst-card ol b{color:var(--accent)}
-.inst-card .ib-close{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
-@media print{.inst-btn,.inst-mask{display:none!important}}
-
 </style>
 <style data-mobovf>
 /* MOBOVF-v1 防止手机横向滑动 */
@@ -266,9 +247,6 @@ body{position:relative}
       <p>十五套本地阅读器 · 目录导航 / 主题分组 / 图表索引 / 摘录标记（按原文顺序排列与导出）/ 专注阅读 / 分屏图文对照 / 随手改字（默认纯阅读不挡加粗；选中文字点「✎改字」才临时编辑该段，失焦自动保存并跨设备同步，点「↺ 回到上一版」撤销）</p>
     </div>
   </header>
-  <!-- INSTBTN-v1 -->
-<button class="inst-btn" id="instBtn" type="button" hidden><span class="ib">⬇</span> 安装到主屏</button>
-
   <div class="stats">
     <div class="stat"><b>15</b><span>本阅读器</span></div>
     <div class="stat"><b>346</b><span>章节 / 篇</span></div>
@@ -946,53 +924,6 @@ window.PA_BACKUP={export:doExport,import:doImport,sync:syncNow,pull:pull,push:pu
 })();
 </script>
 
-<div class="inst-mask" id="instMask"><div class="inst-card"><h3>安装到主屏</h3><p>在手机浏览器里按下面步骤操作，即可像 App 一样全屏打开、离线也能阅读：</p><ol id="instSteps"></ol><button class="ib-close" id="instClose" type="button">知道了</button></div></div>
-
-<script>
-/* INSTBTN-v1 安装到主屏按钮 */
-(function(){
-  if(window.__INSTBTN) return; window.__INSTBTN=1;
-  var btn=document.getElementById('instBtn'), mask=document.getElementById('instMask'),
-      steps=document.getElementById('instSteps'), close=document.getElementById('instClose');
-  if(!btn||!mask) return;
-  // 已在独立模式运行（已安装）→ 不显示按钮
-  var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone===true;
-  if(standalone){ btn.hidden=true; return; }
-
-  var deferred=null;
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-
-  function showBtn(){ btn.hidden=false; }
-  function guide(){
-    if(isIOS){
-      steps.innerHTML='<li>点屏幕底部中间的 <b>分享</b> 按钮（方框向上箭头）</li>'+
-                      '<li>在弹出菜单里向下滑，找到并点 <b>添加到主屏幕</b></li>'+
-                      '<li>右上角点 <b>添加</b> 即可</li>';
-    }else{
-      steps.innerHTML='<li>点浏览器右上角的 <b>⋮ 菜单</b></li>'+
-                      '<li>选择 <b>安装应用</b> 或 <b>添加到主屏幕</b></li>'+
-                      '<li>确认即可</li>';
-    }
-    mask.classList.add('show');
-  }
-  window.addEventListener('beforeinstallprompt', function(e){
-    e.preventDefault(); deferred=e; showBtn();
-  });
-  btn.addEventListener('click', function(){
-    if(deferred){
-      deferred.prompt();
-      deferred.userChoice.then(function(){ deferred=null; });
-    }else{
-      guide();  // iOS 或不支持时给图文引导
-    }
-  });
-  close.addEventListener('click', function(){ mask.classList.remove('show'); });
-  mask.addEventListener('click', function(e){ if(e.target===mask) mask.classList.remove('show'); });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape') mask.classList.remove('show'); });
-  // 兜底：若 3 秒内没触发 beforeinstallprompt（多半是 iOS），也把按钮显示出来用于引导
-  setTimeout(function(){ if(btn.hidden) showBtn(); }, 3000);
-})();
-</script>
-
+<!-- REMINSTBTN-v1 -->
 </body>
 </html>
