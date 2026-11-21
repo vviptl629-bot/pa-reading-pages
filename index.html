@@ -575,6 +575,7 @@ body{
 if(window.__PA_BK) return; window.__PA_BK=1;
 var KEY_T='pa-reading-time-v1', KEY_E='pa-excerpts-v1', KEY_D='pa-excerpts-tomb-v1';
 var KEY_CFG='pa-sync-cfg-v1', GFILE='pa_reader_data.json';
+var KEY_C='pa-corrections-v1'; /* HOME-CORR-v1 */
 var DEF_TOKEN='', DEF_GIST='c6615575d788f7371bcd8fb4494fedc8';
 var NAMES={'price-action-web':'日本蜡烛图','advanced-trend-web':'高级趋势','wave-range-web':'高级波段','pa-best-trades-web':'最佳交易策略','price-action-kbar-web':'逐K阅读','taifei-web':'太妃课程','ghost-web':'华尔街幽灵','zero-to-one-web':'从0到1','cz-web':'币安人生','nishi-web':'逆势者彼得·蒂尔传','money-wars-web':'金钱风云','trade-game-web':'交易游戏','dan-web':'DAN 文集','loser-wins-web':'最懂输的人才能成为赢家','advanced-reversal-web':'高级反转'};
 var isHub=!!document.getElementById('bkHub');
@@ -591,6 +592,8 @@ function getD(){return readLS(KEY_D,[]);}
 function setT(v){try{localStorage.setItem(KEY_T,JSON.stringify(v));}catch(e){}}
 function setE(v){try{localStorage.setItem(KEY_E,JSON.stringify(v));}catch(e){}}
 function setD(v){try{localStorage.setItem(KEY_D,JSON.stringify(v));}catch(e){}}
+function getC(){return readLS(KEY_C,{});}
+function setC(v){try{localStorage.setItem(KEY_C,JSON.stringify(v));}catch(e){}} /* HOME-CORR-v1 */
 
 /* 合并：阅读时长按 天+书 取 max；删除墓碑按 id 取最新；摘录按 id 合并、 tomb 中的剔除 */
 /* MERGEFIX-v1: 摘录对象用 time 字段，兼容读取 t/time */
@@ -620,7 +623,15 @@ function mergeData(a){
   });
   setT(t); setD(Object.keys(dm).map(function(id){return {id:id,t:dm[id]};}));
   setE(Object.keys(em).map(function(id){return em[id];}));
-  }finally{ suppressPush=false; }
+  var _corr=getC(), _corrChanged=false;
+  if(a.corrections&&typeof a.corrections==='object'){
+    Object.keys(a.corrections).forEach(function(k){
+      var r=a.corrections[k]; if(!r||typeof r!=='object') return;
+      if(!_corr[k] || (r.ts||0)>(_corr[k].ts||0)){ _corr[k]=r; _corrChanged=true; }
+    });
+    if(_corrChanged) setC(_corr);
+  }
+  }finally{ suppressPush=false; } /* HOME-CORR-v1 */
 }
 /* ===== LOCALSNAP-v1 本地自动快照（保险层，独立于云同步） ===== */
 (function(){
@@ -727,7 +738,7 @@ function mergeData(a){
   mo.observe(document.body,{childList:true,subtree:true});
 })();
 function snapshot(){
-  return {v:1,app:'pa-reader',exportedAt:new Date().toISOString(),readingTime:getT(),excerpts:getE(),excTomb:getD()};
+  return {v:1,app:'pa-reader',exportedAt:new Date().toISOString(),readingTime:getT(),excerpts:getE(),excTomb:getD(),corrections:getC()}; /* HOME-CORR-v1 */
 }
 function refresh(){
   if(typeof renderNotes==='function'){try{renderNotes();}catch(e){}}
