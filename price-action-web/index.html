@@ -1111,12 +1111,18 @@ document.addEventListener('keydown',e=>{
 <script>
 (function(){
   var KEY='pa-reading-time-v1', BOOK='price-action-web', IDLE=90000, store={};
+  var RTCAP=43200; /* RTMAX-v1 单书单日>12h视为异常假数据 */
+  function capStore(o){if(o&&typeof o==='object')Object.keys(o).forEach(function(d){if(o[d]&&typeof o[d]==='object')Object.keys(o[d]).forEach(function(b){if((o[d][b]||0)>RTCAP)o[d][b]=0;});});return o;}
   try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){store={}}
+  capStore(store); /* RTMAX-v1 */
   var NAMES={'price-action-web':'日本蜡烛图','advanced-trend-web':'高级趋势','wave-range-web':'高级波段','pa-best-trades-web':'最佳交易策略','price-action-kbar-web':'逐K阅读','taifei-web':'太妃课程'};
   function dayStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function today(){return dayStr(new Date());}
   function bucket(day){if(!store[day])store[day]={};return store[day];}
   var lastSaved={}; try{lastSaved=JSON.parse(JSON.stringify(store));}catch(e){lastSaved={}} /* TIMEMERGE-v1 */
+  window.addEventListener('pa-time-synced',function(){ /* SYNCREPAINT-v1 pull后同步内存并重绘 */
+    try{store=JSON.parse(localStorage.getItem(KEY)||'{}')||{};capStore(store);lastSaved=JSON.parse(JSON.stringify(store));paint();}catch(e){}
+  });
   function save(){ /* TIMEMERGE-v1 会话增量叠加到最新localStorage(含云端pull)，避免覆盖/丢失 */
     try{
       var disk={}; try{disk=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){disk={}}
@@ -1130,6 +1136,7 @@ document.addEventListener('keydown',e=>{
           if(delta>0) merged[d][bk]=(merged[d][bk]||0)+delta;
         });
       });
+      capStore(merged); /* RTMAX-v1 */
       store=merged;
       localStorage.setItem(KEY,JSON.stringify(store));
       lastSaved=JSON.parse(JSON.stringify(store));
@@ -1230,16 +1237,19 @@ function setC(v){try{localStorage.setItem(KEY_C,JSON.stringify(v));}catch(e){}}
 /* 合并：阅读时长按 天+书 取 max；删除墓碑按 id 取最新；摘录按 id 合并、 tomb 中的剔除 */
 /* MERGEFIX-v1: 摘录对象用 time 字段，兼容读取 t/time */
 function excTime(x){return (x&&(x.t||x.time))||0;}
+var RT_CAP=43200; /* RTMAX-v1 单书单日>12h视为假数据 */
+function capVal(v){return (v>RT_CAP)?0:v;}
+function capRT(o){if(o&&typeof o==='object')Object.keys(o).forEach(function(d){if(o[d]&&typeof o[d]==='object')Object.keys(o[d]).forEach(function(b){o[d][b]=capVal(o[d][b]);});});return o;}
 function mergeData(a){
   suppressPush=true;
   try{
-  var t=getT(), e=getE(), d=getD();
+  var t=capRT(getT()), e=getE(), d=getD(); /* RTMAX-v1 */
   var _corr=getC(), _corrChanged=false;
   if(a.readingTime&&typeof a.readingTime==='object'){
     Object.keys(a.readingTime).forEach(function(day){
       if(!t[day]) t[day]={};
       var src=a.readingTime[day]||{};
-      Object.keys(src).forEach(function(k){ t[day][k]=Math.max(t[day][k]||0,src[k]||0); });
+      Object.keys(src).forEach(function(k){ t[day][k]=Math.max(capVal(t[day][k]||0),capVal(src[k]||0)); }); /* RTMAX-v1 */
     });
   }
   var dm={}; d.forEach(function(x){dm[x.id]=Math.max(dm[x.id]||0,x.t||0);});
@@ -1255,6 +1265,7 @@ function mergeData(a){
     if(!em[x.id] || excTime(x)>excTime(em[x.id])) em[x.id]=x;
   });
   setT(t); setD(Object.keys(dm).map(function(id){return {id:id,t:dm[id]};}));
+  try{window.dispatchEvent(new Event('pa-time-synced'));}catch(e){} /* SYNCREPAINT-v1 */
   setE(Object.keys(em).map(function(id){return em[id];}));
   if(a.corrections&&typeof a.corrections==='object'){
     Object.keys(a.corrections).forEach(function(k){
@@ -1278,7 +1289,7 @@ function mergeData(a){
   function current(){
     try{ if(typeof snapshot==='function') return snapshot(); }catch(e){}
     return {v:1,app:'pa-reader',exportedAt:new Date().toISOString(),
-      readingTime:lread('pa-reading-time-v1',{}),excerpts:lread('pa-excerpts-v1',[]),
+      readingTime:capRT(lread('pa-reading-time-v1',{})),excerpts:lread('pa-excerpts-v1',[]),
       excTomb:lread('pa-excerpts-tomb-v1',[]),corrections:lread('pa-corrections-v1',{})};
   }
   function getSnaps(){return lread(SNAPKEY,[]);}
@@ -1370,7 +1381,7 @@ function mergeData(a){
   mo.observe(document.body,{childList:true,subtree:true});
 })();
 function snapshot(){
-  return {v:1,app:'pa-reader',exportedAt:new Date().toISOString(),readingTime:getT(),excerpts:getE(),excTomb:getD(),corrections:getC()};
+  return {v:1,app:'pa-reader',exportedAt:new Date().toISOString(),readingTime:capRT(getT()),excerpts:getE(),excTomb:getD(),corrections:getC()};
 }
 function refresh(){
   if(window.PAProof&&PAProof.apply){try{PAProof.apply();}catch(e){}}
