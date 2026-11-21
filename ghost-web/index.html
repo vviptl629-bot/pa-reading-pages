@@ -246,6 +246,12 @@ body.focus-mode .focus-hint{display:block}
 </style>
 
 <!-- EDITUI-FIX-v1 -->
+<style data-mobovf>
+/* MOBOVF-v1 防止手机横向滑动 */
+html,body{overflow-x:hidden!important;max-width:100%!important}
+body{position:relative}
+.mob-topbar{max-width:100vw!important;box-sizing:border-box!important}
+</style>
 </head>
 <body><script>window.addEventListener('error',function(e){var b=document.getElementById('paErrBar');if(!b){b=document.createElement('div');b.id='paErrBar';b.style.cssText='position:fixed;left:0;right:0;top:0;z-index:9999;background:#dc2626;color:#fff;font-size:12px;padding:4px 10px;font-family:monospace;word-break:break-all';document.body.appendChild(b);}b.textContent='脚本错误: '+e.message;});</script>
 <div class="progress" id="progress"></div>

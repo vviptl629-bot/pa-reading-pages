@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>返回书库…</title>
+<style>
+  html,body{margin:0;height:100%;background:#fff;color:#333;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    display:flex;align-items:center;justify-content:center;text-align:center}
+  .box{padding:24px;line-height:1.9}
+  .box b{font-size:18px}
+  .box p{font-size:14px;color:#666}
+  .box a{display:inline-block;margin-top:12px;padding:10px 22px;border:1px solid #0E9488;color:#0E9488;
+    border-radius:9px;text-decoration:none;font-size:14px;font-weight:700}
+</style>
+<script>
+  // GitHub Pages 找不到路径时自动回到书库首页（保留子路径用相对定位）
+  setTimeout(function(){
+    var base = location.pathname.replace(/\/[^/]*$/, '/');
+    location.replace(base + 'index.html');
+  }, 300);
+</script>
+</head>
+<body>
+<div class="box">
+  <b>页面没找到</b>
+  <p>正在返回书库首页…</p>
+  <a href="index.html">点这里立即返回书库</a>
+</div>
+</body>
+</html>

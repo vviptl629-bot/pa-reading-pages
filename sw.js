@@ -3,7 +3,7 @@
  * 导航 network-first（拿到最新，断网回退缓存）；跨域（Gist 同步 api.github.com）不拦截。
  * 所有 fetch/cache 均静默兜底，避免控制台报错干扰阅读。
  */
-const CACHE = 'pa-library-pwa-v1';
+const CACHE = 'pa-library-pwa-v2'; /* SW404-v1 */
 const SHELL = [
   './',
   './index.html',
@@ -74,8 +74,10 @@ function handleFetch(e){
           if (res && res.status === 200 && res.type === 'basic') {
             const copy = res.clone();
             swallow(caches.open(CACHE).then((c) => swallow(c.put(e.request, copy))));
+            return res;
           }
-          return res;
+          // SW404-v1: 非 200（含 404）时回退缓存首页，避免显示原生404
+          return swallow(caches.match(e.request)).then(r => r || caches.match('./index.html')).then(r => r || res);
         })
       ).catch(() => swallow(caches.match(e.request)).then(r => r || caches.match('./index.html')))
     );
