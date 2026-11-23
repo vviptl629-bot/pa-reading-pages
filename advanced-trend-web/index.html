@@ -1522,10 +1522,10 @@ function openPanel(){
   };
   document.getElementById('bkTest').onclick=function(){
     cfg.enabled=true; cfg.token=document.getElementById('bkToken').value.trim(); cfg.gistId=document.getElementById('bkGist').value.trim();
-    saveCfg(); pull(true).then(function(ok){if(ok)return push();});
+    saveCfg(); pull(true).then(function(ok){if(ok)return push();}).then(function(){stat();closePanel();}); /* PANELCLOSE-v1 同步后关闭面板 */
   };
 }
-function closePanel(){var p=document.getElementById('bkPanel');if(p)p.parentNode.removeChild(p.parentNode);var m=document.getElementById('bkMask');if(m)m.parentNode.removeChild(m);}
+function closePanel(){var p=document.getElementById('bkPanel');if(p&&p.parentNode)p.parentNode.remove();} /* CLOSEPANEL-v1 */
 
 /* --- 初始化 --- */
 function init(){
